@@ -78,7 +78,7 @@ def crop_horizontal_pos(center, original_width, original_height, target_width, t
     }
 
 
-def smart_crop(image, target_width, target_height, destination):
+def smart_crop(image, target_width, target_height, destination, do_resize):
     # read grayscale image
     original = cv2.imread(image)
 
@@ -93,11 +93,12 @@ def smart_crop(image, target_width, target_height, destination):
 
     matrix = cv2.imread(image, cv2.CV_LOAD_IMAGE_GRAYSCALE)
 
-    ratio = max(target_width / width, target_height / height)
+    if do_resize:
+        ratio = max(target_width / width, target_height / height)
 
-    width, height = original.shape[1] * ratio, original.shape[0] * ratio
-    original = cv2.resize(original, (int(width), int(height)))
-    matrix = cv2.resize(matrix, (int(width), int(height)))
+        width, height = original.shape[1] * ratio, original.shape[0] * ratio
+        original = cv2.resize(original, (int(width), int(height)))
+        matrix = cv2.resize(matrix, (int(width), int(height)))
 
     center = center_from_faces(matrix)
 
@@ -124,10 +125,11 @@ def main():
     ap.add_argument("-H", "--height", required=True, help="Target height")
     ap.add_argument("-i", "--image", required=True, help="Image to crop")
     ap.add_argument("-o", "--output", required=True, help="Output")
+    ap.add_argument("-n", "--no-resize", required=False, default=False, action="store_true", help="Don't resize image before treating it")
 
     args = vars(ap.parse_args())
 
-    smart_crop(args["image"], args["width"], args["height"], args["output"])
+    smart_crop(args["image"], args["width"], args["height"], args["output"], not args["no_resize"])
 
 
 if __name__ == '__main__':
