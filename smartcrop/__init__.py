@@ -4,6 +4,7 @@ from __future__ import division
 import cv2
 import argparse
 import os
+import math
 
 cascade_path = os.path.dirname(__file__) + '/cascades/haarcascade_frontalface_default.xml'
 
@@ -51,30 +52,31 @@ def center_from_good_features(matrix):
         'y': y / weight
     }
 
+def exact_crop(center, original_width, original_height, target_width, target_height):
+    print (center['y'] + target_height / 2)
+    top = max(center['y'] - math.floor(target_height / 2), 0)
+    offsetH = top + target_height
+    if offsetH > original_height:
+        # overflowing
+        print ("Top side over by " , offsetH - original_height)
+        top = top - (offsetH - original_height)
+    top = max(top, 0)
+    bottom = min(offsetH, original_height)
 
-def crop_vertical_pos(center, original_width, original_height, target_width, target_height):
-    new_height = target_height / target_width * original_width
-    top = max(round(center['y'] - new_height / 2), 0)
-    bottom = min(top + new_height, original_height)
-
-    return {
-        'left': 0,
-        'right': original_width,
-        'top': top,
-        'bottom': bottom
-    }
-
-
-def crop_horizontal_pos(center, original_width, original_height, target_width, target_height):
-    new_width = target_width / target_height * original_height
-    left = max(round(center['x'] - new_width / 2), 0)
-    right = min(left + new_width, original_width)
+    left = max(center['x'] - math.floor(target_width / 2), 0)
+    offsetW = left + target_width
+    if offsetW > original_width:
+        # overflowing
+        print ("Left side over by " , offsetH - original_height)
+        left = left - (offsetW - original_width)
+    left = max(left, 0)
+    right = min(left + target_width, original_width)
 
     return {
         'left': left,
         'right': right,
-        'top': 0,
-        'bottom': original_height
+        'top': top,
+        'bottom': bottom
     }
 
 
@@ -100,6 +102,12 @@ def smart_crop(image, target_width, target_height, destination, do_resize):
         original = cv2.resize(original, (int(width), int(height)))
         matrix = cv2.resize(matrix, (int(width), int(height)))
 
+    if target_height > height:
+        print ('too high')
+
+    if target_width > width:
+        print ('too wide')
+
     center = center_from_faces(matrix)
 
     if not center:
@@ -108,11 +116,7 @@ def smart_crop(image, target_width, target_height, destination, do_resize):
 
     print('Found center: ', center)
 
-    if width / height < target_width / target_height:
-        crop_pos = crop_vertical_pos(center, width, height, target_width, target_height)
-    else:
-        crop_pos = crop_horizontal_pos(center, width, height, target_width, target_height)
-
+    crop_pos = exact_crop(center, width, height, target_width, target_height)
     print('Crop: ', crop_pos)
 
     cropped = original[crop_pos['top']: crop_pos['bottom'], crop_pos['left']: crop_pos['right']]
