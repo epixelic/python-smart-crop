@@ -1,6 +1,10 @@
 # python-smart-crop
 Smart crops images uisng OpenCV
 
-Usage:
+Requires python-opencv
 
-python /home/xorus/projects/reboot/bin/smartcrop.py -W 1140 -H 400 -i input.jpg -o output.jpg
+On debian: `apt install python-opencv`
+
+Install from PIP: `pip install git+https://github.com/epixelic/python-smart-crop`
+
+Usage: `smartcrop -W 1140 -H 400 -i input.jpg -o output.jpg`
