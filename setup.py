@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='smartcrop',
-      version='0.3',
+      version='0.4',
       description='OpenCV smart crop',
       url='https://github.com/epixelic/python-smart-crop',
       author='Josua Gonzalez',
