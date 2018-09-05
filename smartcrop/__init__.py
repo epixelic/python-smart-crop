@@ -164,7 +164,7 @@ def smart_crop(image, target_width, target_height, destination, do_resize):
     crop_pos = exact_crop(center, width, height, target_width, target_height)
     print('Crop rectangle is', crop_pos)
 
-    cropped = original[crop_pos['top']: crop_pos['bottom'], crop_pos['left']: crop_pos['right']]
+    cropped = original[int(crop_pos['top']): int(crop_pos['bottom']), int(crop_pos['left']): int(crop_pos['right'])]
     cv2.imwrite(destination, cropped)
 
 
